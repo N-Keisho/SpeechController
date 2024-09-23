@@ -355,6 +355,7 @@
 "Assets/Script/GridMove/EDir.cs"
 "Assets/Script/GridMove/PlayerGridMove.cs"
 "Assets/Script/GridMove/Pos2D.cs"
+"Assets/Script/PlayerSpeechGridMove.cs"
 "Assets/Script/SpeechController/PlayerMove.cs"
 "Assets/Script/SpeechController/SpeechController.cs"
 -langversion:9.0

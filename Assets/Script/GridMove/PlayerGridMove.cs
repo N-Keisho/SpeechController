@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class PlayerGridMove : MonoBehaviour
 {
-    public int currentFrame = 0;
+    public Pos2D grid;
     private Pos2D newGrid = null;
-    public EDir direction = EDir.Up;
-
-    public Pos2D grid = new Pos2D { x = 0, z = 0 };
+    public EDir direction;
     public float speed = 0.9f;
+    public float maxPerFrame = 1.67f;
+    public float completeFrame;
+    private int currentFrame = 0;
     // Start is called before the first frame update
     void Start()
     {
-
+        completeFrame = maxPerFrame / Time.deltaTime;
     }
 
     // Update is called once per frame
@@ -39,7 +40,7 @@ public class PlayerGridMove : MonoBehaviour
     /**
    * 入力されたキーに対応する向きを返す
    */
-    private EDir KeyToDir()
+    public virtual EDir KeyToDir()
     {
         if (!Input.anyKey)
         {
@@ -72,7 +73,7 @@ public class PlayerGridMove : MonoBehaviour
     /**
    * 引数で与えられた向きに対応する回転のベクトルを返す
    */
-    private Quaternion DirToRotation(EDir d)
+    public virtual Quaternion DirToRotation(EDir d)
     {
         Quaternion r = Quaternion.Euler(0, 0, 0);
         switch (d)
@@ -115,6 +116,9 @@ public class PlayerGridMove : MonoBehaviour
         return Mathf.FloorToInt(zworld / 2);
     }
 
+    /**
+    * 補完で計算して進む
+*/
     private Pos2D Move(Pos2D currentPos, Pos2D newPos, ref int frame)
     {
         float px1 = ToWorldX(currentPos.x);
@@ -122,11 +126,11 @@ public class PlayerGridMove : MonoBehaviour
         float px2 = ToWorldX(newPos.x);
         float pz2 = ToWorldZ(newPos.z);
         frame += 1;
-        float t = frame / 60.0f;
+        float t = frame / completeFrame;
         float newX = px1 + (px2 - px1) * t;
         float newZ = pz1 + (pz2 - pz1) * t;
         transform.position = new Vector3(newX, transform.position.y, newZ);
-        if (frame == 60)
+        if (frame >= completeFrame)
         {
             currentPos = newPos;
             frame = 0;
@@ -134,7 +138,11 @@ public class PlayerGridMove : MonoBehaviour
         return currentPos;
     }
 
-    private Pos2D GetNewGrid(Pos2D position, EDir direction)
+    /**
+    * 現在の座標(position)と移動したい方向(d)を渡すと
+    * 移動先の座標を取得
+*/
+    public virtual Pos2D GetNewGrid(Pos2D position, EDir direction)
     {
         Pos2D newPos = new Pos2D();
         newPos.x = position.x;
