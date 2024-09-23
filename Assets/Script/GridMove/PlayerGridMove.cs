@@ -9,7 +9,7 @@ public class PlayerGridMove : MonoBehaviour
     public EDir direction = EDir.Up;
 
     public Pos2D grid = new Pos2D { x = 0, z = 0 };
-   public float speed = 0.9f;
+    public float speed = 0.9f;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,8 +24,9 @@ public class PlayerGridMove : MonoBehaviour
             EDir d = KeyToDir();
             if (d != EDir.Pause)
             {
-                transform.rotation = DirToRotation(d);
-                newGrid = GetNewGrid(grid, (int)d);
+                direction = d;
+                transform.rotation = DirToRotation(direction);
+                newGrid = GetNewGrid(grid, direction);
                 grid = Move(grid, newGrid, ref currentFrame);
             }
         }
@@ -45,22 +46,22 @@ public class PlayerGridMove : MonoBehaviour
             Debug.Log("Pause");
             return EDir.Pause;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Debug.Log("Left");
             return EDir.Left;
         }
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             Debug.Log("Up");
             return EDir.Up;
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             Debug.Log("Right");
             return EDir.Right;
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             Debug.Log("Down");
             return EDir.Down;
@@ -71,22 +72,22 @@ public class PlayerGridMove : MonoBehaviour
     /**
    * 引数で与えられた向きに対応する回転のベクトルを返す
    */
-   private Quaternion DirToRotation(EDir d)
-   {
-       Quaternion r = Quaternion.Euler(0, 0, 0);
-       switch (d)
-       {
-           case EDir.Left:
-               r = Quaternion.Euler(0, 270, 0); break;
-           case EDir.Up:
-               r = Quaternion.Euler(0, 0, 0); break;
-           case EDir.Right:
-               r = Quaternion.Euler(0, 90, 0); break;
-           case EDir.Down:
-               r = Quaternion.Euler(0, 180, 0); break;
-       }
-       return r;
-   }
+    private Quaternion DirToRotation(EDir d)
+    {
+        Quaternion r = Quaternion.Euler(0, 0, 0);
+        switch (d)
+        {
+            case EDir.Left:
+                r = Quaternion.Euler(0, 270, 0); break;
+            case EDir.Up:
+                r = Quaternion.Euler(0, 0, 0); break;
+            case EDir.Right:
+                r = Quaternion.Euler(0, 90, 0); break;
+            case EDir.Down:
+                r = Quaternion.Euler(0, 180, 0); break;
+        }
+        return r;
+    }
 
     /**
 * グリッド座標をワールド座標に変換
@@ -124,7 +125,7 @@ public class PlayerGridMove : MonoBehaviour
         float t = frame / 60.0f;
         float newX = px1 + (px2 - px1) * t;
         float newZ = pz1 + (pz2 - pz1) * t;
-        transform.position = new Vector3(newX, 0, newZ);
+        transform.position = new Vector3(newX, transform.position.y, newZ);
         if (frame == 60)
         {
             currentPos = newPos;
@@ -133,25 +134,21 @@ public class PlayerGridMove : MonoBehaviour
         return currentPos;
     }
 
-    private Pos2D GetNewGrid(Pos2D position, int direction)
+    private Pos2D GetNewGrid(Pos2D position, EDir direction)
     {
         Pos2D newPos = new Pos2D();
         newPos.x = position.x;
         newPos.z = position.z;
         switch (direction)
         {
-            case 0:
-                newPos.z += 1;
-                break;
-            case 1:
-                newPos.x += 1;
-                break;
-            case 2:
-                newPos.z -= 1;
-                break;
-            case 3:
-                newPos.x -= 1;
-                break;
+            case EDir.Left:
+                newPos.x -= 1; break;
+            case EDir.Up:
+                newPos.z += 1; break;
+            case EDir.Right:
+                newPos.x += 1; break;
+            case EDir.Down:
+                newPos.z -= 1; break;
         }
         return newPos;
     }
